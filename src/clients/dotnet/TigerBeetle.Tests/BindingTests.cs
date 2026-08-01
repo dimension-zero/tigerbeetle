@@ -300,4 +300,180 @@ public class BindingTests
         var serialized = MemoryMarshal.AsBytes<CreateTransferResult>(new CreateTransferResult[] { result }).ToArray();
         Assert.IsTrue(expected.SequenceEqual(serialized));
     }
+
+    [TestMethod]
+    public void ChangeEvents()
+    {
+        var changeEvent = new ChangeEvent();
+
+        changeEvent.TransferId = 100;
+        Assert.AreEqual(changeEvent.TransferId, (UInt128)100);
+
+        changeEvent.TransferAmount = 101;
+        Assert.AreEqual(changeEvent.TransferAmount, (UInt128)101);
+
+        changeEvent.TransferPendingId = 102;
+        Assert.AreEqual(changeEvent.TransferPendingId, (UInt128)102);
+
+        changeEvent.TransferUserData128 = 103;
+        Assert.AreEqual(changeEvent.TransferUserData128, (UInt128)103);
+
+        changeEvent.TransferUserData64 = 104;
+        Assert.AreEqual(changeEvent.TransferUserData64, (ulong)104);
+
+        changeEvent.TransferUserData32 = 105;
+        Assert.AreEqual(changeEvent.TransferUserData32, (uint)105);
+
+        changeEvent.TransferTimeout = 106;
+        Assert.AreEqual(changeEvent.TransferTimeout, (uint)106);
+
+        changeEvent.TransferCode = 107;
+        Assert.AreEqual(changeEvent.TransferCode, (ushort)107);
+
+        var transferFlags = TransferFlags.Linked | TransferFlags.PostPendingTransfer;
+        changeEvent.TransferFlags = transferFlags;
+        Assert.AreEqual(changeEvent.TransferFlags, transferFlags);
+
+        changeEvent.Ledger = 108;
+        Assert.AreEqual(changeEvent.Ledger, (uint)108);
+
+        changeEvent.Type = ChangeEventType.TwoPhasePosted;
+        Assert.AreEqual(changeEvent.Type, ChangeEventType.TwoPhasePosted);
+
+        changeEvent.DebitAccountId = 200;
+        Assert.AreEqual(changeEvent.DebitAccountId, (UInt128)200);
+
+        changeEvent.DebitAccountDebitsPending = 201;
+        Assert.AreEqual(changeEvent.DebitAccountDebitsPending, (UInt128)201);
+
+        changeEvent.DebitAccountDebitsPosted = 202;
+        Assert.AreEqual(changeEvent.DebitAccountDebitsPosted, (UInt128)202);
+
+        changeEvent.DebitAccountCreditsPending = 203;
+        Assert.AreEqual(changeEvent.DebitAccountCreditsPending, (UInt128)203);
+
+        changeEvent.DebitAccountCreditsPosted = 204;
+        Assert.AreEqual(changeEvent.DebitAccountCreditsPosted, (UInt128)204);
+
+        changeEvent.DebitAccountUserData128 = 205;
+        Assert.AreEqual(changeEvent.DebitAccountUserData128, (UInt128)205);
+
+        changeEvent.DebitAccountUserData64 = 206;
+        Assert.AreEqual(changeEvent.DebitAccountUserData64, (ulong)206);
+
+        changeEvent.DebitAccountUserData32 = 207;
+        Assert.AreEqual(changeEvent.DebitAccountUserData32, (uint)207);
+
+        changeEvent.DebitAccountCode = 208;
+        Assert.AreEqual(changeEvent.DebitAccountCode, (ushort)208);
+
+        var debitAccountFlags = AccountFlags.Linked | AccountFlags.History;
+        changeEvent.DebitAccountFlags = debitAccountFlags;
+        Assert.AreEqual(changeEvent.DebitAccountFlags, debitAccountFlags);
+
+        changeEvent.CreditAccountId = 300;
+        Assert.AreEqual(changeEvent.CreditAccountId, (UInt128)300);
+
+        changeEvent.CreditAccountDebitsPending = 301;
+        Assert.AreEqual(changeEvent.CreditAccountDebitsPending, (UInt128)301);
+
+        changeEvent.CreditAccountDebitsPosted = 302;
+        Assert.AreEqual(changeEvent.CreditAccountDebitsPosted, (UInt128)302);
+
+        changeEvent.CreditAccountCreditsPending = 303;
+        Assert.AreEqual(changeEvent.CreditAccountCreditsPending, (UInt128)303);
+
+        changeEvent.CreditAccountCreditsPosted = 304;
+        Assert.AreEqual(changeEvent.CreditAccountCreditsPosted, (UInt128)304);
+
+        changeEvent.CreditAccountUserData128 = 305;
+        Assert.AreEqual(changeEvent.CreditAccountUserData128, (UInt128)305);
+
+        changeEvent.CreditAccountUserData64 = 306;
+        Assert.AreEqual(changeEvent.CreditAccountUserData64, (ulong)306);
+
+        changeEvent.CreditAccountUserData32 = 307;
+        Assert.AreEqual(changeEvent.CreditAccountUserData32, (uint)307);
+
+        changeEvent.CreditAccountCode = 308;
+        Assert.AreEqual(changeEvent.CreditAccountCode, (ushort)308);
+
+        var creditAccountFlags = AccountFlags.DebitsMustNotExceedCredits;
+        changeEvent.CreditAccountFlags = creditAccountFlags;
+        Assert.AreEqual(changeEvent.CreditAccountFlags, creditAccountFlags);
+
+        changeEvent.Timestamp = 99_999;
+        Assert.AreEqual(changeEvent.Timestamp, (ulong)99_999);
+
+        changeEvent.TransferTimestamp = 99_998;
+        Assert.AreEqual(changeEvent.TransferTimestamp, (ulong)99_998);
+
+        changeEvent.DebitAccountTimestamp = 99_997;
+        Assert.AreEqual(changeEvent.DebitAccountTimestamp, (ulong)99_997);
+
+        changeEvent.CreditAccountTimestamp = 99_996;
+        Assert.AreEqual(changeEvent.CreditAccountTimestamp, (ulong)99_996);
+    }
+
+    [TestMethod]
+    public void ChangeEventDefault()
+    {
+        var changeEvent = new ChangeEvent();
+        Assert.AreEqual(changeEvent.TransferId, (UInt128)0);
+        Assert.AreEqual(changeEvent.TransferAmount, (UInt128)0);
+        Assert.AreEqual(changeEvent.TransferPendingId, (UInt128)0);
+        Assert.AreEqual(changeEvent.TransferUserData128, (UInt128)0);
+        Assert.AreEqual(changeEvent.TransferUserData64, (ulong)0);
+        Assert.AreEqual(changeEvent.TransferUserData32, (uint)0);
+        Assert.AreEqual(changeEvent.TransferTimeout, (uint)0);
+        Assert.AreEqual(changeEvent.TransferCode, (ushort)0);
+        Assert.AreEqual(changeEvent.TransferFlags, TransferFlags.None);
+        Assert.AreEqual(changeEvent.Ledger, (uint)0);
+        Assert.AreEqual(changeEvent.Type, ChangeEventType.SinglePhase);
+        Assert.AreEqual(changeEvent.DebitAccountId, (UInt128)0);
+        Assert.AreEqual(changeEvent.DebitAccountFlags, AccountFlags.None);
+        Assert.AreEqual(changeEvent.CreditAccountId, (UInt128)0);
+        Assert.AreEqual(changeEvent.CreditAccountFlags, AccountFlags.None);
+        Assert.AreEqual(changeEvent.Timestamp, (ulong)0);
+        Assert.AreEqual(changeEvent.TransferTimestamp, (ulong)0);
+        Assert.AreEqual(changeEvent.DebitAccountTimestamp, (ulong)0);
+        Assert.AreEqual(changeEvent.CreditAccountTimestamp, (ulong)0);
+    }
+
+    [TestMethod]
+    public void ChangeEventsFilters()
+    {
+        var filter = new ChangeEventsFilter();
+
+        filter.TimestampMin = 100;
+        Assert.AreEqual(filter.TimestampMin, (ulong)100);
+
+        filter.TimestampMax = 101;
+        Assert.AreEqual(filter.TimestampMax, (ulong)101);
+
+        filter.Limit = 102;
+        Assert.AreEqual(filter.Limit, (uint)102);
+    }
+
+    [TestMethod]
+    public void ChangeEventsFilterSerialize()
+    {
+        var expected = new byte[ChangeEventsFilter.SIZE];
+        using (var writer = new BinaryWriter(new MemoryStream(expected)))
+        {
+            writer.Write(100L); // TimestampMin
+            writer.Write(200L); // TimestampMax
+            writer.Write(10); // Limit
+        }
+
+        var filter = new ChangeEventsFilter
+        {
+            TimestampMin = 100,
+            TimestampMax = 200,
+            Limit = 10,
+        };
+
+        var serialized = MemoryMarshal.AsBytes<ChangeEventsFilter>(new ChangeEventsFilter[] { filter }).ToArray();
+        Assert.IsTrue(expected.SequenceEqual(serialized));
+    }
 }

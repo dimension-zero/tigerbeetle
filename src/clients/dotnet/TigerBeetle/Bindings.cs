@@ -1158,6 +1158,262 @@ public struct QueryFilter
 
 }
 
+[StructLayout(LayoutKind.Sequential, Size = SIZE)]
+public struct ChangeEvent
+{
+    public const int SIZE = 384;
+
+
+    [StructLayout(LayoutKind.Sequential, Size = ReservedData.SIZE)]
+    private unsafe struct ReservedData
+    {
+        public const int SIZE = 39;
+        private const int LENGTH = 39;
+
+        private fixed byte raw[LENGTH];
+
+        public byte[] GetData()
+        {
+            fixed (void* ptr = raw)
+            {
+                return new ReadOnlySpan<byte>(ptr, LENGTH).ToArray();
+            }
+        }
+
+        public void SetData(byte[] value)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            if (value.Length != LENGTH)
+            {
+                throw new ArgumentException(
+                    "Expected a byte[" + LENGTH + "] array",
+                    nameof(value));
+            }
+
+            fixed (void* ptr = raw)
+            {
+                value.CopyTo(new Span<byte>(ptr, LENGTH));
+            }
+        }
+    }
+
+    private UInt128 transferId;
+
+    private UInt128 transferAmount;
+
+    private UInt128 transferPendingId;
+
+    private UInt128 transferUserData128;
+
+    private ulong transferUserData64;
+
+    private uint transferUserData32;
+
+    private uint transferTimeout;
+
+    private ushort transferCode;
+
+    private TransferFlags transferFlags;
+
+    private uint ledger;
+
+    private ChangeEventType type;
+
+    private ReservedData reserved;
+
+    private UInt128 debitAccountId;
+
+    private UInt128 debitAccountDebitsPending;
+
+    private UInt128 debitAccountDebitsPosted;
+
+    private UInt128 debitAccountCreditsPending;
+
+    private UInt128 debitAccountCreditsPosted;
+
+    private UInt128 debitAccountUserData128;
+
+    private ulong debitAccountUserData64;
+
+    private uint debitAccountUserData32;
+
+    private ushort debitAccountCode;
+
+    private AccountFlags debitAccountFlags;
+
+    private UInt128 creditAccountId;
+
+    private UInt128 creditAccountDebitsPending;
+
+    private UInt128 creditAccountDebitsPosted;
+
+    private UInt128 creditAccountCreditsPending;
+
+    private UInt128 creditAccountCreditsPosted;
+
+    private UInt128 creditAccountUserData128;
+
+    private ulong creditAccountUserData64;
+
+    private uint creditAccountUserData32;
+
+    private ushort creditAccountCode;
+
+    private AccountFlags creditAccountFlags;
+
+    private ulong timestamp;
+
+    private ulong transferTimestamp;
+
+    private ulong debitAccountTimestamp;
+
+    private ulong creditAccountTimestamp;
+
+    public UInt128 TransferId { get => transferId; set => transferId = value; }
+
+    public UInt128 TransferAmount { get => transferAmount; set => transferAmount = value; }
+
+    public UInt128 TransferPendingId { get => transferPendingId; set => transferPendingId = value; }
+
+    public UInt128 TransferUserData128 { get => transferUserData128; set => transferUserData128 = value; }
+
+    public ulong TransferUserData64 { get => transferUserData64; set => transferUserData64 = value; }
+
+    public uint TransferUserData32 { get => transferUserData32; set => transferUserData32 = value; }
+
+    public uint TransferTimeout { get => transferTimeout; set => transferTimeout = value; }
+
+    public ushort TransferCode { get => transferCode; set => transferCode = value; }
+
+    public TransferFlags TransferFlags { get => transferFlags; set => transferFlags = value; }
+
+    public uint Ledger { get => ledger; set => ledger = value; }
+
+    public ChangeEventType Type { get => type; set => type = value; }
+
+    internal byte[] Reserved { get => reserved.GetData(); set => reserved.SetData(value); }
+
+    public UInt128 DebitAccountId { get => debitAccountId; set => debitAccountId = value; }
+
+    public UInt128 DebitAccountDebitsPending { get => debitAccountDebitsPending; set => debitAccountDebitsPending = value; }
+
+    public UInt128 DebitAccountDebitsPosted { get => debitAccountDebitsPosted; set => debitAccountDebitsPosted = value; }
+
+    public UInt128 DebitAccountCreditsPending { get => debitAccountCreditsPending; set => debitAccountCreditsPending = value; }
+
+    public UInt128 DebitAccountCreditsPosted { get => debitAccountCreditsPosted; set => debitAccountCreditsPosted = value; }
+
+    public UInt128 DebitAccountUserData128 { get => debitAccountUserData128; set => debitAccountUserData128 = value; }
+
+    public ulong DebitAccountUserData64 { get => debitAccountUserData64; set => debitAccountUserData64 = value; }
+
+    public uint DebitAccountUserData32 { get => debitAccountUserData32; set => debitAccountUserData32 = value; }
+
+    public ushort DebitAccountCode { get => debitAccountCode; set => debitAccountCode = value; }
+
+    public AccountFlags DebitAccountFlags { get => debitAccountFlags; set => debitAccountFlags = value; }
+
+    public UInt128 CreditAccountId { get => creditAccountId; set => creditAccountId = value; }
+
+    public UInt128 CreditAccountDebitsPending { get => creditAccountDebitsPending; set => creditAccountDebitsPending = value; }
+
+    public UInt128 CreditAccountDebitsPosted { get => creditAccountDebitsPosted; set => creditAccountDebitsPosted = value; }
+
+    public UInt128 CreditAccountCreditsPending { get => creditAccountCreditsPending; set => creditAccountCreditsPending = value; }
+
+    public UInt128 CreditAccountCreditsPosted { get => creditAccountCreditsPosted; set => creditAccountCreditsPosted = value; }
+
+    public UInt128 CreditAccountUserData128 { get => creditAccountUserData128; set => creditAccountUserData128 = value; }
+
+    public ulong CreditAccountUserData64 { get => creditAccountUserData64; set => creditAccountUserData64 = value; }
+
+    public uint CreditAccountUserData32 { get => creditAccountUserData32; set => creditAccountUserData32 = value; }
+
+    public ushort CreditAccountCode { get => creditAccountCode; set => creditAccountCode = value; }
+
+    public AccountFlags CreditAccountFlags { get => creditAccountFlags; set => creditAccountFlags = value; }
+
+    public ulong Timestamp { get => timestamp; set => timestamp = value; }
+
+    public ulong TransferTimestamp { get => transferTimestamp; set => transferTimestamp = value; }
+
+    public ulong DebitAccountTimestamp { get => debitAccountTimestamp; set => debitAccountTimestamp = value; }
+
+    public ulong CreditAccountTimestamp { get => creditAccountTimestamp; set => creditAccountTimestamp = value; }
+
+}
+
+public enum ChangeEventType : byte
+{
+    SinglePhase = 0,
+
+    TwoPhasePending = 1,
+
+    TwoPhasePosted = 2,
+
+    TwoPhaseVoided = 3,
+
+    TwoPhaseExpired = 4,
+
+}
+
+[StructLayout(LayoutKind.Sequential, Size = SIZE)]
+public struct ChangeEventsFilter
+{
+    public const int SIZE = 64;
+
+
+    [StructLayout(LayoutKind.Sequential, Size = ReservedData.SIZE)]
+    private unsafe struct ReservedData
+    {
+        public const int SIZE = 44;
+        private const int LENGTH = 44;
+
+        private fixed byte raw[LENGTH];
+
+        public byte[] GetData()
+        {
+            fixed (void* ptr = raw)
+            {
+                return new ReadOnlySpan<byte>(ptr, LENGTH).ToArray();
+            }
+        }
+
+        public void SetData(byte[] value)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            if (value.Length != LENGTH)
+            {
+                throw new ArgumentException(
+                    "Expected a byte[" + LENGTH + "] array",
+                    nameof(value));
+            }
+
+            fixed (void* ptr = raw)
+            {
+                value.CopyTo(new Span<byte>(ptr, LENGTH));
+            }
+        }
+    }
+
+    private ulong timestampMin;
+
+    private ulong timestampMax;
+
+    private uint limit;
+
+    private ReservedData reserved;
+
+    public ulong TimestampMin { get => timestampMin; set => timestampMin = value; }
+
+    public ulong TimestampMax { get => timestampMax; set => timestampMax = value; }
+
+    public uint Limit { get => limit; set => limit = value; }
+
+    internal byte[] Reserved { get => reserved.GetData(); set => reserved.SetData(value); }
+
+}
+
 public enum InitializationStatus : uint
 {
     Success = 0,

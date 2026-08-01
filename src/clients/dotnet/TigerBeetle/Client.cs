@@ -108,6 +108,22 @@ public sealed class Client : IDisposable
         return nativeClient.CallRequestAsync<Transfer, QueryFilter>(TBOperation.QueryTransfers, new[] { filter });
     }
 
+    /// <summary>
+    /// Experimental: GetChangeEvents API is undocumented.
+    /// </summary>
+    public ChangeEvent[] GetChangeEvents(ChangeEventsFilter filter)
+    {
+        return nativeClient.CallRequest<ChangeEvent, ChangeEventsFilter>(TBOperation.GetChangeEvents, new[] { filter });
+    }
+
+    /// <summary>
+    /// Experimental: GetChangeEvents API is undocumented.
+    /// </summary>
+    public Task<ChangeEvent[]> GetChangeEventsAsync(ChangeEventsFilter filter)
+    {
+        return nativeClient.CallRequestAsync<ChangeEvent, ChangeEventsFilter>(TBOperation.GetChangeEvents, new[] { filter });
+    }
+
     public void Close()
     {
         nativeClient.Dispose();

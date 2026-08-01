@@ -119,6 +119,20 @@ const type_mappings = .{
         .private_fields = &.{"reserved"},
         .docs_link = "reference/query-filter#",
     } },
+    .{ tb.ChangeEvent, TypeMapping{
+        .name = "ChangeEvent",
+        .visibility = .public,
+        .private_fields = &.{"reserved"},
+    } },
+    .{ tb.ChangeEventType, TypeMapping{
+        .name = "ChangeEventType",
+        .visibility = .public,
+    } },
+    .{ tb.ChangeEventsFilter, TypeMapping{
+        .name = "ChangeEventsFilter",
+        .visibility = .public,
+        .private_fields = &.{"reserved"},
+    } },
     .{ exports.tb_init_status, TypeMapping{
         .name = "InitializationStatus",
         .visibility = .public,

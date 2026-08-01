@@ -2326,6 +2326,124 @@ public class IntegrationTests
         Assert.AreEqual(a.Ledger, b.Ledger);
     }
 
+    /// <summary>
+    /// Change events are the only way to observe a transfer together with both sides of the
+    /// balance change it caused. The assertions below check every field the layout could get
+    /// wrong: a count-only assertion would still pass if `ChangeEvent` were mis-generated.
+    /// </summary>
+    [TestMethod]
+    public void TestGetChangeEvents()
+    {
+        var accounts = GenerateAccounts();
+        var accountResults = client.CreateAccounts(accounts);
+        Assert.AreEqual(accounts.Length, accountResults.Length);
+        Assert.IsTrue(accountResults.All(x => x.Status == CreateAccountStatus.Created));
+
+        var transfers = new Transfer[10];
+        for (int i = 0; i < transfers.Length; i++)
+        {
+            transfers[i] = new Transfer
+            {
+                Id = ID.Create(),
+
+                // Swap the debit and credit accounts:
+                CreditAccountId = i % 2 == 0 ? accounts[0].Id : accounts[1].Id,
+                DebitAccountId = i % 2 == 0 ? accounts[1].Id : accounts[0].Id,
+
+                Ledger = 1,
+                Code = 2,
+                Flags = TransferFlags.None,
+                Amount = 100,
+            };
+        }
+
+        var transferResults = client.CreateTransfers(transfers);
+        Assert.AreEqual(transfers.Length, transferResults.Length);
+        Assert.IsTrue(transferResults.All(x => x.Status == CreateTransferStatus.Created));
+
+        // Bound the filter to the transfers created above, so that transfers written by other
+        // tests sharing this cluster cannot appear in the result.
+        var filter = new ChangeEventsFilter
+        {
+            TimestampMin = transferResults.Min(x => x.Timestamp),
+            TimestampMax = transferResults.Max(x => x.Timestamp),
+            Limit = (uint)transfers.Length,
+        };
+
+        var events = client.GetChangeEvents(filter);
+        Assert.AreEqual(transfers.Length, events.Length);
+
+        ulong timestamp = 0;
+        for (int i = 0; i < events.Length; i++)
+        {
+            var changeEvent = events[i];
+            var transfer = transfers[i];
+
+            Assert.AreEqual(ChangeEventType.SinglePhase, changeEvent.Type);
+            Assert.AreEqual(transfer.Id, changeEvent.TransferId);
+            Assert.AreEqual(transfer.Amount, changeEvent.TransferAmount);
+            Assert.AreEqual(transfer.Ledger, changeEvent.Ledger);
+            Assert.AreEqual(transfer.Code, changeEvent.TransferCode);
+            Assert.AreEqual(transfer.Flags, changeEvent.TransferFlags);
+            Assert.AreEqual(transfer.DebitAccountId, changeEvent.DebitAccountId);
+            Assert.AreEqual(transfer.CreditAccountId, changeEvent.CreditAccountId);
+
+            // Results are ordered by timestamp ascending, and a single-phase event shares its
+            // timestamp with the transfer that produced it.
+            Assert.IsTrue(changeEvent.Timestamp > timestamp);
+            timestamp = changeEvent.Timestamp;
+            Assert.AreEqual(transferResults[i].Timestamp, changeEvent.TransferTimestamp);
+            Assert.AreEqual(changeEvent.Timestamp, changeEvent.TransferTimestamp);
+
+            // Both accounts must have been touched no later than the transfer itself.
+            Assert.IsTrue(changeEvent.DebitAccountTimestamp > 0);
+            Assert.IsTrue(changeEvent.DebitAccountTimestamp <= changeEvent.TransferTimestamp);
+            Assert.IsTrue(changeEvent.CreditAccountTimestamp > 0);
+            Assert.IsTrue(changeEvent.CreditAccountTimestamp <= changeEvent.TransferTimestamp);
+        }
+
+        // Each transfer of 100 moves the running balance by 100, alternating direction, so the
+        // posted totals recorded on the last event must account for every transfer so far.
+        var last = events[^1];
+        Assert.AreEqual((UInt128)(100 * transfers.Length / 2), last.DebitAccountDebitsPosted);
+        Assert.AreEqual((UInt128)(100 * transfers.Length / 2), last.CreditAccountCreditsPosted);
+    }
+
+    [TestMethod]
+    public async Task TestGetChangeEventsAsync()
+    {
+        var accounts = GenerateAccounts();
+        var accountResults = await client.CreateAccountsAsync(accounts);
+        Assert.IsTrue(accountResults.All(x => x.Status == CreateAccountStatus.Created));
+
+        var transfer = new Transfer
+        {
+            Id = ID.Create(),
+            CreditAccountId = accounts[0].Id,
+            DebitAccountId = accounts[1].Id,
+            Ledger = 1,
+            Code = 2,
+            Flags = TransferFlags.None,
+            Amount = 100,
+        };
+
+        var transferResults = await client.CreateTransfersAsync(new[] { transfer });
+        Assert.AreEqual(1, transferResults.Length);
+        Assert.AreEqual(CreateTransferStatus.Created, transferResults[0].Status);
+
+        var events = await client.GetChangeEventsAsync(new ChangeEventsFilter
+        {
+            TimestampMin = transferResults[0].Timestamp,
+            TimestampMax = transferResults[0].Timestamp,
+            Limit = 1,
+        });
+
+        Assert.AreEqual(1, events.Length);
+        Assert.AreEqual(transfer.Id, events[0].TransferId);
+        Assert.AreEqual(transfer.Amount, events[0].TransferAmount);
+        Assert.AreEqual(ChangeEventType.SinglePhase, events[0].Type);
+    }
+
     private static bool AssertException<T>(Exception exception) where T : Exception
     {
         while (exception is AggregateException aggregateException && aggregateException.InnerException != null)
