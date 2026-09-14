@@ -1,7 +1,14 @@
 # Changelog
 
+## Unreleased
+
 Subscribe to the [announcements issue #2231](https://github.com/tigerbeetle/tigerbeetle/issues/2231)
 to receive notifications about breaking changes and critical issues!
+
+### Changed
+- Update 4 files
+
+Closed since last commit: none (dimension-zero)
 
 ## TigerBeetle 0.17.9
 
