@@ -10,11 +10,6 @@ to receive notifications about breaking changes and critical issues!
 
 Closed since last commit: none (dimension-zero)
 
-### Added
-- Add 7 files
-
-Closed since last commit: none (dimension-zero)
-
 ## TigerBeetle 0.17.9
 
 Released: 2026-07-03
